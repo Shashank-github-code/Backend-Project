@@ -8,14 +8,15 @@ dotenv.config({
 })
 
 connectDB()
+.then(()=>{
+    app.listen(process.listen.PORT || 8000, () =>{
+        console.log(`server is running at port:${process.env.PORT}`);
+    })
 
-
-
-
-
-
-
-
+})
+.catch((error)=>{
+    crossOriginIsolated.log("MongoDB connection failed!!!", error)
+})
 
 
 

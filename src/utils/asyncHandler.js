@@ -1,9 +1,11 @@
+//The asyncHandler function is a higher-order function designed to simplify error handling in asynchronous Express middleware
+
 // const asyncHandler = () => {}
 
 // using promises
 const asyncHandler=(requestHandler)=>{
     (req,res,next)=>{
-        Promise.resolve(requestHandler(req,res,next)).catch((err) => next(err))
+        Promise.resolve(requestHandler(req,res,next)).catch((error) => next(err))
     }
 }    
 
@@ -14,7 +16,7 @@ export{asyncHandler}
 //     try {
 //         await fn(req,res,next)        
 //     } catch (error) {
-//         res.status(err.code || 500).jason({
+//         res.status(error.code || 500).jason({
 //             success: false,
 //             message: err.message
 //         })

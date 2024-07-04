@@ -48,18 +48,19 @@ const userSchema=new Schema(
         timestamp: true
     }
 )
-// an pre operation that must happen when save is clicked
-userSchema.Schema.pre("Save", async function(next){
-    if(!this.isModified("password")) return next
+// The .pre method is a Mongoose middleware function. 
+//It allows you to define pre-save hooks that run before a document is saved to the database.
+// async function(next) { ... }: This defines an asynchronous function to be executed before the save operation. The next parameter is a callback function that must be called to proceed to the next middleware or complete the operation.
+userSchema.pre("save", async function(next) {
+    if (!this.isModified("password")) return next();
 
-    this.password = bcrypt.hash(this.password, 10)
-    next()
-})
-
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
 userSchema.methods.ispasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password)
 }
-
+//jwt.sign({ ... }): This calls the sign method from the jsonwebtoken (JWT) library. The sign method generates a new JSON Web Token (JWT).
 userSchema.methods.generateAccessToken = function(){
     jwt.sign({
         _id: this._id,

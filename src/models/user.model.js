@@ -1,4 +1,6 @@
 import mongoose,{Schema} from 'mongoose'
+import bcrypt from "bcrypt"
+import jwt from 'jsonwebtoken';
 
 const userSchema=new Schema(
     {
@@ -10,7 +12,7 @@ const userSchema=new Schema(
             trim: true,
             index: true
         },
-        emai:{
+        email:{
             type: String,
             required: true,
             unique: true,
@@ -45,7 +47,7 @@ const userSchema=new Schema(
         }
     },
     {
-        timestamp: true
+        timestamps: true
     }
 )
 // The .pre method is a Mongoose middleware function. 
@@ -62,7 +64,7 @@ userSchema.methods.ispasswordCorrect = async function(password){
 }
 //jwt.sign({ ... }): This calls the sign method from the jsonwebtoken (JWT) library. The sign method generates a new JSON Web Token (JWT).
 userSchema.methods.generateAccessToken = function(){
-    jwt.sign({
+    return jwt.sign({
         _id: this._id,
         email: this.email,
         username: this.username,
@@ -75,7 +77,7 @@ userSchema.methods.generateAccessToken = function(){
 )
 }
 userSchema.methods.generateRefreshToken = function(){
-    jwt.sign({
+    return jwt.sign({
         _id: this._id,
         email: this.email,
         username: this.username,

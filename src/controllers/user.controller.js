@@ -153,32 +153,32 @@ const loginUser = asyncHandler(async (req, res) => {
     )
 })
 
-const logoutUser = asyncHandler(async (req, res) => {
-    // no req.body access here as there is not post req for logout 
-    // so we need a middleware which gives the user access to the req to delete the tokken using some id 
-    // the middleware is auth.middleware.js
-    await User.findByIdAndUpdate(
-        req.user._id,
-        { 
-            $set:{             //$set: This is a MongoDB update operator that sets the value of a field in the document.
-                refreshToken: undefined
-            }
-        },
-        {
-            new: true
-        }
-    )
+// const logoutUser = asyncHandler(async (req, res) => {
+//     // no req.body access here as there is not post req for logout 
+//     // so we need a middleware which gives the user access to the req to delete the tokken using some id 
+//     // the middleware is auth.middleware.js
+//     await User.findByIdAndUpdate(
+//         req.user._id,
+//         { 
+//             $set:{             //$set: This is a MongoDB update operator that sets the value of a field in the document.
+//                 refreshToken: undefined
+//             }
+//         },
+//         {
+//             new: true
+//         }
+//     )
 
-    const options = {
-        http: true,
-        secure: true
-    }
-    return res
-    .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
-    .jason(new ApiResponse(200, {}, "User logged out successfully"))
+//     const options = {
+//         http: true,
+//         secure: true
+//     }
+//     return res
+//     .status(200)
+//     .clearCookie("accessToken", options)
+//     .clearCookie("refreshToken", options)
+//     .jason(new ApiResponse(200, {}, "User logged out successfully"))
 
-})
+// })
 
 export { registerUser, loginUser, logoutUser } 

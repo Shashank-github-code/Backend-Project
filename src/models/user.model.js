@@ -55,13 +55,13 @@ const userSchema=new Schema(
 // async function(next) { ... }: This defines an asynchronous function to be executed before the save operation. The next parameter is a callback function that must be called to proceed to the next middleware or complete the operation.
 userSchema.pre("save", async function(next) {
     if (!this.isModified("password")) return next();
-
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
-userSchema.methods.ispasswordCorrect = async function(password){
-    return await bcrypt.compare(password, this.password)
-}
+userSchema.methods.isPasswordCorrect = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
+
 //jwt.sign({ ... }): This calls the sign method from the jsonwebtoken (JWT) library. The sign method generates a new JSON Web Token (JWT).
 userSchema.methods.generateAccessToken = function(){
     return jwt.sign({
@@ -70,7 +70,7 @@ userSchema.methods.generateAccessToken = function(){
         username: this.username,
         fullName: this.fullName
     },  
-    process.env.ACCESS_TOKEN_SECRRET,
+    process.env.ACCESS_TOKEN_SECRET,
     {
         expiresIn: process.env.ACCESS_TOKEN_EXPIRY
     }

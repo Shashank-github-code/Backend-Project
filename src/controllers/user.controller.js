@@ -246,16 +246,16 @@ const changeCurrentPassword = asyncHandler(async(req,res) => {
 const getCurrentUser = asyncHandler(async (req, res) =>{
     return res
     .status(200)
-    .json(200, req.user, "current user fetched successfully")
+    .json(new ApiResponse(200, req.user, "current user fetched successfully"))
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) =>{
     const {fullName, email} = req.body
     if(!(fullName && email)){
-        throw new ApiError(400, "All fiels are required")
+        throw new ApiError(400, "All fields are required")
     }
 
-    User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set:{
@@ -326,5 +326,128 @@ const updateUserCoverImage = asyncHandler(async (req, res) =>{
     .json(new ApiResponse(200, user, "Cover Image updated successfully"))
 })
 
+const getUserChannelProfile = asyncHandler (async (req, res) =>{
+    // /username will be requested so getting from params
+    const {username} = req.params
+    if(!username?.trim()){
+        throw new ApiError(400, "Username is missing")
+    }
+    
+    // instead of .find we can use $match
+    // $match: Filters the documents to pass only those that match the specified conditions.
+    const channel = await User.aggregate([
+        {
+            $match:{
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            $lookup:{
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",// now channel in schema selected for finding the subscribers
+                as: "subscribers"
+            }
+        },
+        {
+            $lookup:{
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",// now subscriber in schema selected for finding the subcribedto
+                as: "subscribedTo"
+            }
+        },
+        {
+            $addFields:{  // adds additional fields 
+                subscribersCount:{
+                    $size: "$subscriber"   // getting the size gives the subscribers as selection process is already done
+                },
+                channelsSubscribedToCount:{
+                    $size: "$subscribedTo"  // same here
+                },
+                isSubscribed:{// for the subscribbed button
+                    $cond:{
+                        if: {$in:[req.user?._id, "$subscribers.subscriber"]}, // checking if user is present in subscribers list or not
+                        then: true,
+                        else: false 
+                    }
+                }
+            }
+        },
+        {
+            $project:{  // used for sending only selected fields
+                fullname: 1,
+                username: 1,
+                avatar: 1,
+                coverImage: 1,
+                subscribersCount: 1,
+                channelsSubscribedToCount: 1,
+                email: 1
+            }
+        }
+    ])
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage}
+    if(!channel?.length){
+        throw new ApiError(404, "Channel does not exist")
+    }
+
+    // aggrate pipeline returns an array. So channel[0] contains profile we fetched
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, channel[0], "User channel fetched successfully")
+    )
+})
+
+const getWatchHistory = asyncHandler(async(req , res) => {
+    const user = await User.aggregate([
+        {
+            $match:{
+                _id: new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup:{
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                // nested pipeline for getting the user form there
+                pipeline: [
+                    {
+                        $lookup:{
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            // adding the pipline within lookup will apply the following pipeline in owner
+                            pipeline: [
+                                {
+                                    $project:{
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        },
+                        $addfield:{
+                            owner:{// getting the first element from the array
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200,user[0].getWatchHistory,"watch history fetched successfully"))
+})
+
+
+
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getWatchHistory}

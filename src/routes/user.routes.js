@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser,loginUser, logoutUser } from "../controllers/user.controller.js";
+import { registerUser,loginUser, logoutUser, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar,                   updateUserCoverImage,getUserChannelProfile, getWatchHistory} from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { refreshAccessToken } from "../controllers/user.controller.js";
@@ -31,5 +31,19 @@ router.route("/login").post(loginUser)
 router.route("/logout").post(verifyJWT, logoutUser)
 
 router.route("/refresh-token").post(refreshAccessToken)
+
+router.route("/change-password").post(verifyJWT,changeCurrentPassword)
+
+router.route("/current-user").get(verifyJWT,getCurrentUser)
+
+router.route("/update-account").patch(verifyJWT,updateAccountDetails)// patch if few deatils are eto be changed
+
+router.route("/avatar").patch(verifyJWT,upload.single("Avatar",updateUserAvatar))
+
+router.route("/cover-image").patch(verifyJWT,upload.single("CoverImage"),updateUserCoverImage)
+
+router.route("/c/:username").get(verifyJWT,getUserChannelProfile)//  /c/:" "   this route is used as params is being used in controller
+
+router.route("/history").get(verifyJWT,getWatchHistory)
 
 export default router

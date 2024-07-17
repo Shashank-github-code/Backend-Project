@@ -107,7 +107,7 @@ const loginUser = asyncHandler(async (req, res) => {
     // req body -> data
     // username or email
     // find the user
-    // passworfd check
+    // password check
     // access and refresh token
     // send cookies
 
@@ -156,7 +156,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req, res) => {
     // no req.body access here as there is not post req for logout 
-    // so we need a middleware which gives the user access to the req to delete the tokken using some id 
+    // so we need a middleware which gives the user access to the req to delete the token using some id 
     // the middleware is auth.middleware.js
     await User.findByIdAndUpdate(
         req.user._id,

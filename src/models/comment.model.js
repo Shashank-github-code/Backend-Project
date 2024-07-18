@@ -4,7 +4,7 @@ import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 const commentSchema = new Schema( 
     {
         // id automatically aa jaega
-        content:{
+        comment:{
             type: String,
             required: true
         },
@@ -22,6 +22,6 @@ const commentSchema = new Schema(
     }
 )
 
-videoSchema.plugin(mongooseAggregatePaginate)
+commentSchema.plugin(mongooseAggregatePaginate)
 
 export const Comment = mongoose.model("Comment",commentSchema)

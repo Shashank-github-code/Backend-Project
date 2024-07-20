@@ -31,6 +31,7 @@ const addSubscribtion = asyncHandler(async (req, res) => {
         subscriber: subscriberId,
         channel: channelId
     });
+    return res.status(200).json(new ApiResponse(200, newSubcriber, "Subscribed"));
 
 });
 const getAllSubscribers = asyncHandler(async (req,res) => {

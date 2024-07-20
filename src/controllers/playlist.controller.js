@@ -16,7 +16,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
     }
 
     // Check for existing playlist in the specific userId
-    const existingPlaylist = await Playlist.findOne({ name, user: userId });
+    const existingPlaylist = await Playlist.findOne({ name, owner: userId });
     if (existingPlaylist) {
         throw new ApiError(400, "A playlist with the same name already exists");
     }

@@ -19,11 +19,13 @@ import userRouter from './routes/user.routes.js'
 import playlistRouter from "./routes/playlist.routes.js"
 import videoRouter from "./routes/video.routes.js"
 import commentRouter from "./routes/comment.routes.js"
+import subscribtionRouter from "./routes/subscribtion.routes.js"
 
 app.use("/api/v1/users", userRouter);  // /api/v1/users/userRouter where (userRouter = all the routes from user.routes file)
 app.use("/api/v1/playlists", playlistRouter);
 app.use("/api/v1/videos", videoRouter)
 app.use("/api/v1/comments", commentRouter)
+app.use("/api/v1/subscribtions", subscribtionRouter);
 
 // http://localhost:8000/api/v1/users/register
 
